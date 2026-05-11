@@ -48,7 +48,10 @@ Resources:
 
           docker pull ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/dvca-fargate-backend
           docker rm $CONTAINER_NAME || true
-          docker run --name $CONTAINER_NAME -p 80:80 -d --restart=always -e ALLOWED_FETCH_HOSTS=serverless-api.${DomainName},fargate-api.${DomainName},ec2-api.${DomainName} -e ALLOWED_FETCH_URLS=https://serverless-api.${DomainName},https://fargate-api.${DomainName},https://ec2-api.${DomainName} ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/dvca-fargate-backend
+          docker run --name $CONTAINER_NAME -p 80:80 -d --restart=always \
+            -e ALLOWED_FETCH_HOSTS=serverless-api.${DomainName},fargate-api.${DomainName},ec2-api.${DomainName} \
+            -e ALLOWED_FETCH_URLS=https://serverless-api.${DomainName},https://fargate-api.${DomainName},https://ec2-api.${DomainName} \
+            ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/dvca-fargate-backend
 
           docker rm $CONTAINER_NAME
 

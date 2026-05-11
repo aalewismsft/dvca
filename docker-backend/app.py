@@ -68,9 +68,7 @@ def _is_allowed_url(url):
         return False
     if parsed.hostname.lower() not in ALLOWED_FETCH_HOSTS:
         return False
-    if not _is_public_target(parsed.hostname):
-        return False
-    return _get_allowed_target(url) is not None
+    return _is_public_target(parsed.hostname)
 
 @app.route('/', methods=['GET'])
 def health():
@@ -80,7 +78,7 @@ def health():
 def ssrf():
     url = request.form.get('handler', '').strip()
     target_url = _get_allowed_target(url)
-    if not _is_allowed_url(url) or target_url is None:
+    if target_url is None or not _is_allowed_url(url):
         return json.dumps({"error": "Target URL is not allowed"}), 400
     try:
         response_text = urlopen(target_url, timeout=5).read().decode("utf-8", "backslashreplace")

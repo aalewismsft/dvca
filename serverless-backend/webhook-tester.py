@@ -64,9 +64,7 @@ def _is_allowed_url(url):
         return False
     if parsed.hostname.lower() not in ALLOWED_FETCH_HOSTS:
         return False
-    if not _is_public_target(parsed.hostname):
-        return False
-    return _get_allowed_target(url) is not None
+    return _is_public_target(parsed.hostname)
 
 def handler(event, context):
     body = event.get("body") or ""
@@ -75,7 +73,7 @@ def handler(event, context):
     target_url = _get_allowed_target(url)
     print(f"URL: {url}")
 
-    if not _is_allowed_url(url) or target_url is None:
+    if target_url is None or not _is_allowed_url(url):
         return {
             "statusCode": 400,
             "body": json.dumps({"error": "Target URL is not allowed"}),
