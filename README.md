@@ -36,3 +36,18 @@ Just be careful: The frontend needs your root domain Certificate ID for the Clou
 In the end, you should end-up with something like this  :-)
 
 ![DVCA](https://raw.githubusercontent.com/m6a-UdS/dvca/master/img/DVCA.png)
+
+## Security Review Process
+Security governance and review artifacts:
+- Program policy and rollout: `/home/runner/work/dvca/dvca/docs/security/security-review-program.md`
+- Asset inventory and trust boundaries: `/home/runner/work/dvca/dvca/docs/security/asset-inventory.md`
+- Review checklists: `/home/runner/work/dvca/dvca/docs/security/checklists.md`
+- OWASP compliance baseline: `/home/runner/work/dvca/dvca/docs/security/owasp-compliance.md`
+- Exceptions register: `/home/runner/work/dvca/dvca/security/exceptions.json`
+
+GitHub review and automation:
+- PR template: `/home/runner/work/dvca/dvca/.github/pull_request_template.md`
+- Security finding issue template: `/home/runner/work/dvca/dvca/.github/ISSUE_TEMPLATE/security-finding.yml`
+- CODEOWNERS security sign-off scope: `/home/runner/work/dvca/dvca/.github/CODEOWNERS`
+- Security workflows: `/home/runner/work/dvca/dvca/.github/workflows/security-review.yml`, `/home/runner/work/dvca/dvca/.github/workflows/codeql.yml`
+

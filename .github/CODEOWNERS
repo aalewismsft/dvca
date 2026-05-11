@@ -1,0 +1,9 @@
+# Security owner sign-off for high-risk paths
+/docker-backend/app.py @aalewismsft
+/serverless-backend/webhook-tester.py @aalewismsft
+/cloudformation/**/*.yml @aalewismsft
+/Makefile @aalewismsft
+/docker-backend/Dockerfile @aalewismsft
+/docker-backend/requirements.txt @aalewismsft
+/security/** @aalewismsft
+/scripts/security/** @aalewismsft

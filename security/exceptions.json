@@ -1,0 +1,13 @@
+{
+  "exceptions": [
+    {
+      "id": "EXAMPLE-INTENTIONAL-SSRF-001",
+      "tool": "semgrep",
+      "path": "docker-backend/app.py",
+      "owner": "security-owner",
+      "expires_on": "2026-12-31",
+      "status": "active",
+      "reason": "Intentional SSRF behavior for training scenario; governed by security review policy."
+    }
+  ]
+}
