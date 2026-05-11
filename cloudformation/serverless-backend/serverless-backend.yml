@@ -33,11 +33,12 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: webhook-tester.handler
-      Runtime: python3.6
+      Runtime: python3.12
       CodeUri: ../../serverless-backend
       Environment:
         Variables:
           CORS: !Sub https://${DomainName}
+          ALLOWED_FETCH_HOSTS: !Sub serverless-api.${DomainName},fargate-api.${DomainName},ec2-api.${DomainName}
       Events:
         GetApi:
           Type: Api
