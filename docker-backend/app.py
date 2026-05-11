@@ -17,13 +17,18 @@ ALLOWED_FETCH_HOSTS = {
     for host in os.getenv("ALLOWED_FETCH_HOSTS", "").split(",")
     if host.strip()
 }
+ALLOWED_FETCH_URLS = tuple(
+    target.strip()
+    for target in os.getenv("ALLOWED_FETCH_URLS", "").split(",")
+    if target.strip()
+)
 LOGGER = logging.getLogger(__name__)
 
 
 def _is_public_target(hostname):
     try:
         addresses = socket.getaddrinfo(hostname, None)
-    except socket.gaierror:
+    except (socket.gaierror, OSError):
         return False
 
     resolved = set()
@@ -50,13 +55,22 @@ def _is_public_target(hostname):
     return True
 
 
+def _get_allowed_target(url):
+    for candidate in ALLOWED_FETCH_URLS:
+        if candidate == url:
+            return candidate
+    return None
+
+
 def _is_allowed_url(url):
     parsed = urlparse(url)
     if parsed.scheme not in SAFE_SCHEMES or not parsed.hostname:
         return False
     if parsed.hostname.lower() not in ALLOWED_FETCH_HOSTS:
         return False
-    return _is_public_target(parsed.hostname)
+    if not _is_public_target(parsed.hostname):
+        return False
+    return _get_allowed_target(url) is not None
 
 @app.route('/', methods=['GET'])
 def health():
@@ -65,10 +79,11 @@ def health():
 @app.route('/test-hook', methods=['POST'])
 def ssrf():
     url = request.form.get('handler', '').strip()
-    if not _is_allowed_url(url):
+    target_url = _get_allowed_target(url)
+    if not _is_allowed_url(url) or target_url is None:
         return json.dumps({"error": "Target URL is not allowed"}), 400
     try:
-        response_text = urlopen(url, timeout=5).read().decode("utf-8", "backslashreplace")
+        response_text = urlopen(target_url, timeout=5).read().decode("utf-8", "backslashreplace")
     except (TimeoutError, URLError, ValueError) as exc:
         LOGGER.warning("Target fetch failed: %s", exc)
         return json.dumps({"error": "Unable to fetch target URL"}), 502

@@ -39,6 +39,7 @@ Resources:
         Variables:
           CORS: !Sub https://${DomainName}
           ALLOWED_FETCH_HOSTS: !Sub serverless-api.${DomainName},fargate-api.${DomainName},ec2-api.${DomainName}
+          ALLOWED_FETCH_URLS: !Sub https://serverless-api.${DomainName},https://fargate-api.${DomainName},https://ec2-api.${DomainName}
       Events:
         GetApi:
           Type: Api
