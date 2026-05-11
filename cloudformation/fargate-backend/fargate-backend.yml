@@ -23,6 +23,11 @@ Resources:
         Image: !Sub
         - '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepo}'
         - ECRRepo: !ImportValue DVCA-ECRRepo
+        Environment:
+        - Name: ALLOWED_FETCH_HOSTS
+          Value: !Sub serverless-api.${DomainName},fargate-api.${DomainName},ec2-api.${DomainName}
+        - Name: ALLOWED_FETCH_URLS
+          Value: !Sub https://serverless-api.${DomainName},https://fargate-api.${DomainName},https://ec2-api.${DomainName}
         MemoryReservation: 256
         PortMappings:
         - ContainerPort: 80

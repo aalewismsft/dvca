@@ -1,0 +1,89 @@
+name: Security Review
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  SECURITY_ENFORCEMENT_MODE: monitor
+
+jobs:
+  validate-exceptions:
+    name: Validate exceptions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate exception metadata
+        run: python3 /home/runner/work/dvca/dvca/scripts/security/validate_exceptions.py
+
+  semgrep-sast:
+    name: Semgrep SAST (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/default
+
+  checkov-iac:
+    name: Checkov IaC (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: /home/runner/work/dvca/dvca/cloudformation
+          quiet: true
+          framework: cloudformation
+
+  trivy-deps-and-image:
+    name: Trivy dependency/container scan (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -t dvca-fargate-backend:ci /home/runner/work/dvca/dvca/docker-backend
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: fs
+          scan-ref: /home/runner/work/dvca/dvca
+          severity: CRITICAL,HIGH,MEDIUM
+          format: table
+          ignore-unfixed: true
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: image
+          image-ref: dvca-fargate-backend:ci
+          severity: CRITICAL,HIGH,MEDIUM
+          format: table
+          ignore-unfixed: true
+
+  gitleaks-secrets:
+    name: Secret scan (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
